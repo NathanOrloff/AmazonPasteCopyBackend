@@ -1,9 +1,12 @@
 package api.services;
 
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.regions.Region;
+
 import java.util.concurrent.CompletableFuture;
 
 
@@ -29,50 +32,22 @@ public class S3Service {
         return s3.putObject(s3Request, AsyncRequestBody.fromBytes(file));
     }
 
+    public static CompletableFuture<ResponseBytes<GetObjectResponse>> downloadFileBytes(String bucket, String key) {
+        getS3Client();
+        GetObjectRequest s3Request = GetObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+        return s3.getObject(s3Request, AsyncResponseTransformer.toBytes());
+    }
 
-    // // List all objects in the S3 bucket
-    // public List<String> listObjects() {
-    //     ListObjectsV2Request request = ListObjectsV2Request.builder()
-    //             .bucket(bucketName)
-    //             .build();
-    //     ListObjectsV2Response response = s3.listObjectsV2(request);
-        
-    //     return response.contents().stream()
-    //             .map(S3Object::key)
-    //             .collect(Collectors.toList());
-    // }
-
-    // // Upload a file to S3
-    // public void uploadFile(String key, String filePath) {
-    //     PutObjectRequest request = PutObjectRequest.builder()
-    //             .bucket(bucketName)
-    //             .key(key)
-    //             .build();
-        
-    //     s3.putObject(request, RequestBody.fromFile(new File(filePath)));
-    //     System.out.println("File uploaded: " + key);
-    // }
-
-    // // Download a file from S3
-    // public void downloadFile(String key, String destinationPath) {
-    //     GetObjectRequest request = GetObjectRequest.builder()
-    //             .bucket(bucketName)
-    //             .key(key)
-    //             .build();
-        
-    //     s3.getObject(request, Paths.get(destinationPath));
-    //     System.out.println("File downloaded to: " + destinationPath);
-    // }
-
-    // // Delete a file from S3
-    // public void deleteFile(String key) {
-    //     DeleteObjectRequest request = DeleteObjectRequest.builder()
-    //             .bucket(bucketName)
-    //             .key(key)
-    //             .build();
-        
-    //     s3.deleteObject(request);
-    //     System.out.println("File deleted: " + key);
-    // }
+    public static CompletableFuture<DeleteObjectResponse> deleteFile(String bucket, String key) {
+        getS3Client();
+        DeleteObjectRequest s3Request = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+        return s3.deleteObject(s3Request);
+    }
     
 }

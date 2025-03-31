@@ -56,8 +56,7 @@ public class PostPaste implements RequestHandler<APIGatewayProxyRequestEvent, AP
             PasteMetadata metadata = new PasteMetadata(uuid, bucketName, uuid, createdTime, deleteTime);
 
             // post data record to dynamo table
-            DynamoDbService dynamoDbService = new DynamoDbService();
-            CompletableFuture<PutItemResponse> dbWriteFuture = dynamoDbService.postPasteMetadata(metadata, tableName);
+            CompletableFuture<PutItemResponse> dbWriteFuture = DynamoDbService.postPasteMetadata(metadata, tableName);
 
             // Ensure both operations complete before returning
             CompletableFuture.allOf(s3UploadFuture, dbWriteFuture).join();
