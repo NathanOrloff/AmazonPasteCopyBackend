@@ -7,6 +7,9 @@ import software.amazon.awssdk.services.dynamodb.model.PutItemResponse;
 import software.amazon.awssdk.services.dynamodb.model.QueryRequest;
 import software.amazon.awssdk.services.dynamodb.model.QueryResponse;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemRequest;
+import software.amazon.awssdk.services.dynamodb.model.DeleteItemResponse;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -69,6 +72,19 @@ public class DynamoDbService {
                 .build();
 
         return dynamoDbClient.query(queryRequest);
+    }
+
+    public static CompletableFuture<DeleteItemResponse> deletePasteMetadataByUuid(String tableName, String uuid) {
+        getDynamoDbClient();
+        Map<String, AttributeValue> expressionValues = new HashMap<>();
+        expressionValues.put("pk", AttributeValue.builder().s(uuid).build());
+
+        DeleteItemRequest queryRequest = DeleteItemRequest.builder()
+                .tableName(tableName)  // Specify your DynamoDB table name
+                .key(expressionValues)
+                .build();
+
+        return dynamoDbClient.deleteItem(queryRequest);
     }
     
 }
